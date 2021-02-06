@@ -56,7 +56,10 @@
         <?php endif; ?>
 
         <?php if (isset($_GET['kode']) && !isset($_GET['kesimpulan'])) : ?>
-          <h4 class="mb-4">Pilih pertanyaan dibawah ini jika anda merasakan gejalanya </h4>
+          <?php
+          include "functions/get_kesimpulan.php";
+          $kesimpulan = getKesimpulan($kode); ?>
+          <h4 class="mb-4">Pilih pertanyaan dibawah ini jika anda merasakan gejala dari penyakit <?php echo $kesimpulan['nama_penyakit'] ?> </h4>
           <?php echo "<form action='diagnose.php?kesimpulan&kode=" . $kode . "'" . "method='post'>" ?>
           <?php
           $query = "SELECT * from tb_pertanyaan WHERE kode_pertanyaan='$kode'";
@@ -84,13 +87,14 @@
               foreach ($_POST['check_list'] as $selected) {
                 $selectedGejala[] = $selected;
               }
+              $kesimpulan = getKesimpulan($kode);
               if ($totalRows == count($selectedGejala)) {
           ?>
 
                 <h3 class="text-left mb-4">Kesimpulan Diagnosa</h3>
                 <?php
                 session_start();
-                $kesimpulan = getKesimpulan($kode);
+
                 $dataGejala = $kesimpulan['fakta'];
                 $gejala = str_replace("\\n", "\n", $dataGejala);
                 $dataSolusi = $kesimpulan['solusi'];
@@ -111,7 +115,7 @@
                 <?php echo "<pre class='mt-3 mb-0 text-left'>" . nl2br($solusi) . "</pre>" ?>
 
           <?php  } else {
-                echo  "<h2>Sistem tidak dapat mendeteksi </h2>";
+                echo  "<h2>Sistem tidak dapat mendeteksi penyakit " . $kesimpulan['nama_penyakit'] .  "</h2>";
                 echo "<a href='diagnose.php' class='btn btn-primary'>Ulangi Kembali</a>";
               }
             }
